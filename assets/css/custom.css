@@ -1,0 +1,60 @@
+/* Hacker-ish theme: dark, clean, and readable */
+
+body {
+background-color: #1e1e1e;
+color: #e0e0e0;
+font-family: "Fira Code", "Courier New", Courier, monospace;
+line-height: 1.8;
+padding: 2rem;
+max-width: 720px;
+margin: auto;
+font-size: 1.05rem;
+}
+
+a {
+color: #80cbc4;
+text-decoration: none;
+}
+
+a:hover {
+text-decoration: underline;
+}
+
+h1, h2, h3 {
+color: #ffd54f;
+border-bottom: 1px solid #555;
+padding-bottom: 0.2em;
+margin-top: 2em;
+}
+
+ul {
+padding-left: 1.5em;
+margin-top: 1em;
+}
+
+code, pre {
+background-color: #2d2d2d;
+color: #c3e88d;
+padding: 0.2em 0.4em;
+border-radius: 4px;
+font-size: 0.95rem;
+}
+
+pre {
+padding: 1em;
+overflow: auto;
+}
+
+img {
+max-width: 100%;
+display: block;
+margin: 1rem auto;
+}
+
+blockquote {
+border-left: 4px solid #555;
+padding-left: 1rem;
+color: #aaa;
+font-style: italic;
+margin: 1.5rem 0;
+}
