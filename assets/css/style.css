@@ -1,0 +1,23 @@
+body {
+  font-family: sans-serif;
+  background: #fdfdfd;
+  color: #222;
+  display: flex;
+}
+.sidebar {
+  background: #eee;
+  padding: 1rem;
+  width: 200px;
+  height: 100vh;
+}
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.sidebar li {
+  margin-bottom: 10px;
+}
+.content {
+  padding: 2rem;
+  flex-grow: 1;
+}
