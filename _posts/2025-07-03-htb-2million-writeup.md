@@ -2,9 +2,13 @@
 layout: post
 title: "Hack The Box: 2Million - A Narrative Walkthrough"
 date: 2025-07-03
-tags: [htb, ctf, walkthrough, cybersecurity]
+tags:
+  - htb
+  - ctf
+  - walkthrough
+  - cybersecurity
+categories: blog
 ---
-
 # Hack The Box: 2Million - A Narrative Walkthrough
 
 Welcome to my walkthrough of the Hack The Box (HTB) machine: **2Million**. What began as a series of recon notes evolved into a story of curiosity, API exploration, privilege escalation, and ultimately, root access. Let's dive in.
@@ -22,10 +26,8 @@ nmap -A 10.10.11.221 -oN scan.initial
 The scan revealed two open ports:
 
 - **22/tcp**: OpenSSH 8.9p1
-    
 - **80/tcp**: HTTP (nginx)
-    
-
+  
 Navigating to the IP in a browser resulted in a redirect to `http://2million.htb/`, which didn't resolve—until I added the following line to my `/etc/hosts` file:
 
 ```bash
@@ -34,8 +36,8 @@ Navigating to the IP in a browser resulted in a redirect to `http://2million.htb
 
 Once added, the page loaded immediately. It looked like a promotional site for HTB. Scrolling down, I saw a call to action inviting me to join. I clicked.
 
-![[Pasted image 20250701185331.png]]
-![[Pasted image 20250701185430.png]]
+![How do I join?](/assets/images/Pasted%20image%2020250701185331.png)
+![Invite Code](/assets/images/Pasted%20image%2020250701185430.png)
 
 
 
@@ -241,7 +243,7 @@ make all
 ./exp
 ```
 
-![[Pasted image 20250702183058.png]]
+![Rooted](/assets/images/Pasted%20image%2020250702183058.png)
 Root shell popped.
 
 ## Final Thoughts
