@@ -1,0 +1,16 @@
+# Ignore common OS cruft
+.DS_Store
+Thumbs.db
+
+# Ignore Obsidian cache
+.obsidian/cache
+.obsidian/workspace
+
+# Ignore Jekyll output
+_site/
+.jekyll-cache/
+.sass-cache/
+
+# Editor temp files
+*.swp
+*.swo
