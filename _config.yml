@@ -1,22 +1,11 @@
+
 title: desvert's blog
 description: Hacking notes, walkthroughs, and tech stuff.
-url: "https://desvert.github.io" # change if using a custom domain
-baseurl: "" # keep empty for user site like desvert.github.io
+url: "https://desvert.github.io"
+baseurl: ""
 
-theme: minima
+markdown: kramdown
+theme: null
 
 plugins:
   - jekyll-feed
-  - jekyll-seo-tag
-
-markdown: kramdown
-kramdown:
-  input: GFM
-
-sass:
-  load_paths:
-    - _sass
-    - assets/css
-
-include:
-  - _includes
