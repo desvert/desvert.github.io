@@ -71,14 +71,14 @@ blockquote {
   position: fixed;
   top: 0;
   right: 0;
-  width: 20vw;
+  width: 20%;
   height: auto;
   aspect-ratio: 1 / 1;
   background-image: url('/assets/images/logo.png');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: top right;
-  opacity: 0.05;
+  opacity: 0.5;
   z-index: -1;
   pointer-events: none;
 }
