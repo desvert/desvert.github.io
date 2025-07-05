@@ -65,3 +65,20 @@ blockquote {
   font-style: italic;
   margin: 1.5rem 0;
 }
+
+#logo-bg::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 20vw;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  background-image: url('/assets/images/logo.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: top right;
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+}
