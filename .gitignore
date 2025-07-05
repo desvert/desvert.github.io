@@ -14,3 +14,6 @@ _site/
 # Editor temp files
 *.swp
 *.swo
+
+# ignore Drafts
+drafts/
