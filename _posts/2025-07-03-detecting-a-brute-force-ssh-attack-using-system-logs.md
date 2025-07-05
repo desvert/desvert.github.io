@@ -60,7 +60,7 @@ This strongly suggested an automated brute-force or dictionary attack.
 To confirm this pattern across the full log, I filtered it using `grep` and `awk`. If you have access to the full `/var/log/auth.log` file, you can run:
 
 ```bash
-grep "sshd.*invalid user" /var/log/auth.log | awk '{print $9, $10}'
+grep "sshd.*invalid user" /var/log/auth.log | awk '{print $10, $11, $12}'
 ```
 
 This command extracts just the username and IP address fields for each failed attempt.
@@ -68,13 +68,13 @@ This command extracts just the username and IP address fields for each failed at
 To see which usernames were targeted:
 
 ```bash
-grep "invalid user" /var/log/auth.log | awk '{print $9}' | sort | uniq -c | sort -nr
+grep "invalid user" /var/log/auth.log | awk '{print $10}' | sort | uniq -c | sort -nr
 ```
 
 To count how many times the same IP tried to log in:
 
 ```bash
-grep "invalid user" /var/log/auth.log | awk '{print $10}' | sort | uniq -c | sort -nr
+grep "invalid user" /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -nr
 ```
 
 ---
