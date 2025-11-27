@@ -14,7 +14,7 @@ The long-term plan is to build something that follows the same pattern used in r
 
 **Sensors → Controller → Logic → Actuators → Monitoring Interface**
 
-I have a mix of hardware to work with, including ESP32 boards, Arduino clones, a Raspberry Pi Pico, and a Raspberry Pi Zero 2W that will eventually serve as a small “supervisory” device. I have also salvaged several components from retired HVAC equipment, such as a T6613 CO2 sensor and a thermistor module. My aim is to build up this environment step by step, testing real control strategies along the way.
+I have a mix of hardware to work with, including ESP32 boards, Arduino Uno clones, a Raspberry Pi Pico, and a Raspberry Pi Zero 2W that will eventually serve as a small “supervisory” device. I have also salvaged several components from retired HVAC equipment, such as a T6613 CO2 sensor and a thermistor module. My aim is to build up this environment step by step, testing real control strategies along the way.
 
 Phase One focused on a simple but important loop: measure temperature and use it to control a fan.
 
@@ -26,7 +26,7 @@ I started with an ESP32 dev board, a 10k NTC thermistor, and a small 5 V CPU fan
 
 The first part was getting reliable temperature readings. I wired the thermistor into a voltage divider and wrote a small sketch to convert the ADC reading to a temperature using the beta coefficient formula. I printed the output to the serial monitor to make sure everything behaved as expected.
 
-The next step was controlling the fan. I wired the CPU fan through an IRLZ44N MOSFET so the ESP32 could drive it with PWM. The fan runs on the 5 V rail of my breadboard power module, and the ESP32 runs from the 3.3 V rail. Both rails share a common ground. The ESP32 drives the MOSFET gate through a 220 ohm resistor, with a 100k pulldown to keep the fan off when the ESP32 is not driving the pin. A 1N4007 diode across the fan protects the circuit from voltage spikes.
+The next step was controlling the fan. I wired the CPU fan through an IRLZ44N MOSFET so the ESP32 could drive it with PWM. The fan runs on the 5 V rail of my breadboard power module, and the ESP32 is powered from its USB cable. The ESP32 drives the MOSFET gate through a 220 ohm resistor, with a 100k pulldown to keep the fan off when the ESP32 is not driving the pin. A 1N4007 diode across the fan protects the circuit from voltage spikes.
 
 Once everything was wired up, the PWM control worked immediately. I could see the duty cycle change in the serial output, and the fan speed matched it physically. This confirmed that the basic output side of the loop was working.
 
