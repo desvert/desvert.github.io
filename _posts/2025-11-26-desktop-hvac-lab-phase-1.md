@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Desktop HVAC Lab: Phase 1"
+title: Desktop HVAC Lab: Phase 1
 date: 2025-11-26 23:56:47
 categories: [blog]
 tags: []
