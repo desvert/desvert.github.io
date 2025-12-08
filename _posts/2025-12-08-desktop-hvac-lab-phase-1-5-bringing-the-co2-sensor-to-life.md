@@ -14,7 +14,7 @@ It turns out: _pretty far._
 
 The first step was desoldering the T6613 module from its carrier board. The original board expected 24V, but the bare module runs on just 5V, making it easier to integrate into my bench setup.
 
-![CO₂ module](../assets/images/t6613.webp)
+![CO₂ module](/assets/images/t6613.webp)
 
 ---
 
