@@ -1,17 +1,13 @@
-# **---
+---
 layout: post
 title: "Phase 2: Building the Primary HVAC Controller"
 date: 2025-12-17 21:39:14
 categories: [blog]
 tags: []
-excerpt: ""
+
 ---
 
 ## Building the Primary HVAC Controller
-
-<!-- Write your blog content here -->
-
-**
 
 Over the last couple of weeks, I’ve been working on a small project that blends my HVAC background with my growing interest in embedded systems and OT security. I’m building a miniature “desktop HVAC system” that behaves like the control loops I work with in the field, just scaled down to a breadboard and a handful of sensors.
 
