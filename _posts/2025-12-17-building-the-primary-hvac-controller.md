@@ -1,6 +1,6 @@
 # **---
 layout: post
-title: "Building the Primary HVAC Controller"
+title: "Phase 2: Building the Primary HVAC Controller"
 date: 2025-12-17 21:39:14
 categories: [blog]
 tags: []
