@@ -124,7 +124,7 @@ Ventilation demand increases with CO₂ levels:
 
 - < 800 ppm → damper at 45°
 - 800–1200 ppm → damper at 90°
-- > 1200 ppm → damper at 120°, and fan forced to at least medium
+- \> 1200 ppm → damper at 120°, and fan forced to at least medium
 
 This is the same concept used in demand-controlled ventilation (DCV). In my small setup, the actuator is just a servo, but it behaves convincingly like a damper motor.
 
