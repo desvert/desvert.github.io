@@ -22,7 +22,7 @@ What follows isn’t a tutorial. It’s a short write-up of the operational deci
 
 ### Why containerize it at all?
 
-The Bedrock Dedicated Server runs fine on bare metal, but I didn’t want another snowflake service living directly on the host. Containerizing it solved several problems immediately.
+The Bedrock Dedicated Server runs fine on bare metal, but I didn’t want another another service with its fingers in the host filesystem. Containerizing it solved several problems immediately.
 
 It created a clean separation between the host OS and the application, gave me a single command to bring the service up after a reboot, and made restart behavior predictable if the server ever crashed. It also gave me a clear place to define configuration and persistent storage.
 
