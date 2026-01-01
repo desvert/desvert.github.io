@@ -10,7 +10,20 @@
   <div id="logo-bg">
     <h1>{{ site.title }}</h1>
     <p>Welcome to my personal blog — a collection of hacking notes, walkthroughs, and technical explorations. This is where I document what I’m learning, breaking, and building, one step at a time.</p>
-    <br>
+    
+    <h2>Selected Projects</h2>
+    <ul>
+      <li>
+        <a href="https://github.com/desvert/containerized-bedrock-server">Containerized Bedrock Server</a><br>
+        Dockerized Linux service with automated backups and configuration enforcement.
+      </li>
+      <li>
+        <a href="https://github.com/desvert/ot-hvac-testbed">OT HVAC Testbed</a><br>
+        HVAC control and instrumentation testbed used to explore real-world OT/ICS concepts.
+      </li>
+    </ul>
+
+    <h2>Posts</h2>
     <ul>
       {% for post in site.posts %}
         <li>
