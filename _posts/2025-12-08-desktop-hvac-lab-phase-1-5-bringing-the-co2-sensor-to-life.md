@@ -2,8 +2,15 @@
 layout: post
 title: "Desktop HVAC Lab Phase 1.5 - Bringing the CO2 Sensor to Life"
 date: 2025-12-08 00:24:35
-categories: [blog]
-tags: []
+categories:  
+  - blog
+tags: 
+  - hvac
+  - embedded
+  - microcontrollers
+  - sensors
+  - control-systems
+  - operational-technology
 excerpt: ""
 ---
 # Desktop HVAC Lab Phase 1.5 — Bringing the CO₂ Sensor to Life
@@ -106,3 +113,10 @@ Seeing the two curves overlay nicely was a great confirmation that the calibrati
 Now that the sensor is validated and logging reliably, it’s ready to join the rest of the desktop HVAC lab. The next step is wiring it into the ESP32 and integrating the data into my (in-progress) dashboard. Once that’s in place, I can start experimenting with ventilation control based on CO₂ levels: closing the loop from sensors to airflow.
 
 More updates coming soon.
+
+---
+
+### Related links
+
+- Project repository:  
+    [https://github.com/desvert/ot-hvac-testbed](https://github.com/desvert/ot-hvac-testbed)

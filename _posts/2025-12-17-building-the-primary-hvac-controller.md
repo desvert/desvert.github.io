@@ -2,8 +2,15 @@
 layout: post
 title: "Phase 2: Building the Primary HVAC Controller"
 date: 2025-12-17 21:39:14
-categories: [blog]
-tags: []
+categories: 
+  - blog
+tags: 
+  - hvac
+  - embedded
+  - microcontrollers
+  - iot
+  - control-systems
+  - operational-technology
 
 ---
 
@@ -176,3 +183,10 @@ The primary controller is now stable and behaving like a small HVAC controller s
     
 
 This is becoming much more than a hobby project. It’s turning into a functional learning tool for HVAC controls and (eventually) cybersecurity testing.
+
+---
+
+### Related links
+
+- Project repository:  
+    [https://github.com/desvert/ot-hvac-testbed](https://github.com/desvert/ot-hvac-testbed)

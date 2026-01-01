@@ -2,8 +2,15 @@
 layout: post
 title: "Running a Small Service Like It Matters"
 date: 2025-12-28 00:57:07
-categories: [blog]
-tags: []
+categories: 
+    - blog
+tags: 
+    - homelab
+    - linux
+    - automation
+    - docker
+    - linux-service
+    - backups
 
 ---
 
@@ -91,7 +98,7 @@ This server reinforced a simple idea: scale doesn’t change fundamentals.
 
 Even a small service benefits from automated startup, graceful backups, explicit configuration, and documentation of intent. Treating a "toy" service seriously turned it into a useful environment for practicing Linux administration, container management, and operational thinking.
 
-Those habits translate cleanly to larger systems. 
+Those habits translate directly to larger systems. 
 
 ---
 

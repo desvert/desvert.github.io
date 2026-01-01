@@ -2,8 +2,15 @@
 layout: post
 title: Desktop HVAC Lab - Phase 1
 date: 2025-11-26 23:56:47
-categories: [blog]
-tags: []
+categories: 
+  - blog
+tags: 
+  - hvac
+  - embedded
+  - microcontrollers
+  - iot
+  - control-systems
+  - operational-technology
 excerpt: ""
 ---
 # **Building a Desktop HVAC Lab: Project Overview and Phase One Progress**
@@ -49,3 +56,10 @@ This first step gives me the core mechanics that HVAC controls are built on. The
 Later I will expand the system to explore networked communication, logging, and security. This will create a hands-on platform where I can study how real building control systems behave, and how they break when they are designed without security in mind.
 
 For now, Phase One is up and running. It is a small step, but it forms the foundation for everything else that will follow.
+
+---
+
+### Related links
+
+- Project repository:  
+    [https://github.com/desvert/ot-hvac-testbed](https://github.com/desvert/ot-hvac-testbed)
