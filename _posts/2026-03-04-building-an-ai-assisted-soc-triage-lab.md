@@ -14,9 +14,8 @@ tags:
 
 ---
 
-**Building an AI-Assisted SOC Triage Lab with Claude, MCP, and Docker**
+# **Building an AI-Assisted SOC Triage Lab with Claude, MCP, and Docker**
 
----
 
 ## Introduction
 
