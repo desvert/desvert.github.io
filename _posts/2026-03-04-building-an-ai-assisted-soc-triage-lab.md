@@ -28,6 +28,8 @@ At the same time, large language models have become very good at summarizing com
 
 This project is a small lab environment built around that idea. The result is a workflow where an LLM acts more like a junior analyst, while established tools still do the heavy lifting. Here's how it's put together and what I learned building it.
 
+The full source, setup instructions, and tool reference are in the [project repository](https://github.com/desvert/ai-soc-mcp-lab).
+
 ---
 
 ## The Core Problem with "AI Analyzing PCAPs"
