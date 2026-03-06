@@ -1,5 +1,7 @@
 /* Hacker-ish theme: dark, clean, and readable */
 
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap');
+
 body {
   background-color: #1e1e1e;
   color: #e0e0e0;
@@ -26,11 +28,30 @@ a:hover {
 }
 
 h1, h2, h3 {
-  color: #ffd54f;
-  border-bottom: 1px solid #555;
+  font-family: "JetBrains Mono", "Fira Code", "Courier New", Courier, monospace;
+  font-weight: 600;
+  border-bottom: 1px solid #2e2e2e;
   padding-bottom: 0.2em;
   margin-top: 2em;
-  font-family: "Fira Code", "Courier New", Courier, monospace;
+}
+
+h1 {
+  color: #80cbc4;
+  font-size: 1.75rem;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  color: #80cbc4;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+}
+
+h3 {
+  color: #a5d6d3;
+  font-size: 1.1rem;
+  font-weight: 400;
+  border-bottom: none;
 }
 
 ul {
@@ -44,7 +65,7 @@ code, pre {
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 0.95rem;
-  font-family: "Fira Code", "Courier New", Courier, monospace;
+  font-family: "JetBrains Mono", "Fira Code", "Courier New", Courier, monospace;
 }
 
 pre {
@@ -82,4 +103,3 @@ blockquote {
   z-index: -1;
   pointer-events: none;
 }
-
