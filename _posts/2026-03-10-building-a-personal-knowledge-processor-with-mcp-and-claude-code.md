@@ -6,7 +6,7 @@ date: 2026-03-10
 
 There is a gap between raw notes and something useful.
 
-After every lab session, every Cisco module, every HVAC testbed experiment, I end up with a folder full of half-formed markdown files, terminal screenshots, and log dumps. The ideas are there. The structure is not. Turning that pile into a write-up worth keeping has always been the friction point.
+After every lab session, every course module, every HVAC testbed experiment, I end up with a folder full of half-formed markdown files, terminal screenshots, and log dumps. The ideas are there. The structure is not. Turning that pile into a write-up worth keeping has always been the friction point.
 
 I built something to close that gap. It is called knowledgeops-mcp, and it is a Dockerized MCP server that gives Claude Code access to a notes folder. Drop in your raw material, describe what you want, and Claude Code produces a structured write-up with a self-quiz section and a short project blurb. The full source and setup instructions are in the [repository](https://github.com/desvert/knowledgeops-mcp).
 
