@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Taking Control: OpenWrt, Pi-hole, and a Network I Can Actually Configure"
-date: 2026-04-XX
+date: 2026-04-26
 categories:
     - blog
 tags:
