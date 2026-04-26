@@ -9,17 +9,28 @@
 <body>
   <div id="logo-bg">
     <h1>{{ site.title }}</h1>
-    <p>I'm a commercial HVAC technician working toward a career in cybersecurity. This blog is where I document the work: building OT control systems and then figuring out how to break them, working through CTFs and wargames, and occasionally running a small service the right way just to see what that takes.</p>
+    <p>I'm a commercial HVAC technician transitioning into IT and OT security. This blog documents the work: building lab tools for network forensics and OT protocol analysis, experimenting with AI-assisted SOC workflows, and occasionally running a small service the right way just to see what that takes.
     
     <h2>Selected Projects</h2>
     <ul>
       <li>
-        <a href="https://github.com/desvert/containerized-bedrock-server">Containerized Bedrock Server</a><br>
-        Dockerized Linux service with automated backups and configuration enforcement.
+        <a href="https://github.com/desvert/netparse">netparse</a>
+        MCP server for network forensics. Parses saved PCAPs with tshark and returns structured data for LLM-assisted triage.
       </li>
+      
       <li>
-        <a href="https://github.com/desvert/ot-hvac-testbed">OT HVAC Testbed</a><br>
-        HVAC control and instrumentation testbed used to explore real-world OT/ICS concepts.
+        <a href="https://github.com/desvert/otparse-mcp">otparse</a>
+        MCP server for OT/ICS PCAP analysis. Parses Modbus/TCP and BACnet/IP traffic and returns structured JSON for LLM analysis.
+      </li>
+
+      <li>
+        <a href="https://github.com/desvert/mcp-test-env">mcp-test-env</a>
+        Docker Compose lab that generates realistic attack traffic using Metasploitable2, automated exploitation, and packet capture sensors.
+      </li>
+
+      <li>
+        <a href="https://github.com/desvert/ot-hvac-testbed">OT HVAC Testbed</a><br>OT HVAC Testbed
+        HVAC control and instrumentation testbed for exploring real-world OT/ICS concepts.
       </li>
     </ul>
 
