@@ -149,7 +149,7 @@ Two SSIDs: `ether` on 5GHz for trusted devices, `labnet` on 2.4GHz for IoT and E
 
 ## What Came Out of Building It
 
-An early attempt at switch configuration — adjusting VLAN assignments via `swconfig` — caused complete loss of connectivity across all ports. Not one port, all of them. The C7 required two factory resets before the bridge was back in a working state. WiFi should be enabled in software before touching anything on the switch side, so there's a fallback that doesn't depend on the wired bridge. That's now a standard step before any switch work.
+An early attempt at switch configuration — adjusting VLAN assignments via swconfig before the Catalyst arrived — caused complete loss of connectivity across all ports. Not one port, all of them. The C7 required two factory resets before the bridge was back in a working state. The lesson landed early: enable WiFi in software before touching anything on the switch side, so there's a fallback that doesn't depend on the wired bridge. That's now a standard step before any switch work — and it came in handy later when the real VLAN migration hit its first wall.
 
 The Pi-hole situation was a good reminder that "it runs in Docker everywhere else" isn't the same as "it will work in Docker here." A combination of environmental factors made the containerized path genuinely impractical for this specific setup, not just inconvenient.
 
