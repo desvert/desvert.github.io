@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Taking Control: OpenWrt, Pi-hole, and a Network I Can Actually Configure"
+title: "Homelab 1: Taking Control"
 date: 2026-04-26
 categories:
     - blog
