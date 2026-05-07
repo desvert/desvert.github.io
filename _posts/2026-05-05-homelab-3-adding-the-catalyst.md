@@ -1,4 +1,11 @@
-## layout: post title: "Adding the Catalyst" date: 2026-05-05 categories: - blog tags: - homelab - networking - cisco - ccna - vlan - linux excerpt: ""
+---
+layout: post 
+title: "Adding the Catalyst" 
+date: 2026-05-05 
+categories: - blog 
+tags: - homelab - networking - cisco - ccna - vlan - linux 
+excerpt: ""
+---
 
 # Adding the Catalyst
 
