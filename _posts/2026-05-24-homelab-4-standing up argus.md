@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Standing Up argus"
+title: "Homelab 4: Standing Up argus"
 date: 2026-05-24
 categories:
     - blog
