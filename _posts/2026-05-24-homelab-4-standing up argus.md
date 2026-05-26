@@ -76,6 +76,8 @@ Prometheus 3.x no longer ships `consoles/` or `console_libraries/` directories. 
 
 Official RPM repo. Port 3000, data at `/mnt/data/grafana`. Prometheus added as a data source and confirmed green. Dashboard 1860 (Node Exporter Full) imported from grafana.com. Once node_exporter is running on both hosts, both `argus` and `thing` appear in the instance dropdown without any additional configuration.
 
+![ Screenshot of Grafana dashboard 1860 showing both argus and thing in the instance dropdown](/assets/images/homelab-4-grafana-node-exporter.png)
+
 ---
 
 ## node_exporter
@@ -132,6 +134,9 @@ Setting up the Telegram bot takes about two minutes via BotFather. Get a token, 
 ```
 2026-05-02T05:36:58.124Z | labnet/sensors/env/01/temperature | {"device":"env-node-01","celsius":18.59,"fahrenheit":65.46,"rssi":-39}
 ```
+
+![Screenshot of the Node-RED flow showing the MQTT In, switch, and two parallel branches](/assets/images/homelab-4-node-red-mqtt-flow.png)
+![Screenshot of a Telegram alert message received from the Argus Alerts bot ](/assets/images/homelab-4-telegram-alert-message.jpg)
 
 ---
 

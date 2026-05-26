@@ -135,6 +135,8 @@ curl -sSL https://install.pi-hole.net | bash
 
 Upstream DNS pointed at the C7 (`192.168.1.1`) with the Verizon gateway as a fallback. The C7's DHCP server hands out `192.168.1.111` as the DNS server for every LAN client. Every device that picks up an address gets Pi-hole automatically.
 
+![Pi-hole admin dashboard screenshot](/assets/images/homelab-post-1-pi-hole-dash.png)
+
 The Docker detour wasn't wasted. Working through each failure made it clear exactly why this environment was incompatible with that approach: the musl libc behavior, the Pi-hole v6 changes, and the C7's firewall posture all stacked against it.
 
 ---
