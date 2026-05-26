@@ -135,7 +135,7 @@ Setting up the Telegram bot takes about two minutes via BotFather. Get a token, 
 2026-05-02T05:36:58.124Z | labnet/sensors/env/01/temperature | {"device":"env-node-01","celsius":18.59,"fahrenheit":65.46,"rssi":-39}
 ```
 
-![Screenshot of the Node-RED flow showing the MQTT In, switch, and two parallel branches](/assets/images/homelab-4-node-red-mqtt-flow.png)
+![Screenshot of the Node-RED flow showing the MQTT In, switch, and two parallel branches](/assets/images/homelab-post-4-node-red-mqtt-flow.png)
 ![Screenshot of a Telegram alert message received from the Argus Alerts bot ](/assets/images/homelab-4-telegram-alert-message.jpg)
 
 ---
