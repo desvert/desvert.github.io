@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Watching the Wire"
+title: "Homelab 5: Watching the Wire"
 date: 2026-05-26
 categories:
     - blog
