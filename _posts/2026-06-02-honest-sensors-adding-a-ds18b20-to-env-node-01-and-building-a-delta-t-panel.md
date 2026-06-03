@@ -4,7 +4,8 @@ layout: post
 title: "Honest Sensors: Adding a DS18B20 to env-node-01 and Building a Delta T Panel" 
 date: 2026-06-02 
 categories: 
-  - blog tags: 
+  - blog 
+tags: 
   - homelab 
   - esp32 
   - mqtt 
