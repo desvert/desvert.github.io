@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cap Load Check</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Live under-load capacitor µF test and go/no-go verdict for HVAC techs.">
+<meta name="theme-color" content="#1f6f78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#eef1f3;
+    --surface:#ffffff;
+    --surface-2:#e4e9ec;
+    --border:#c9d2d6;
+    --text:#14181b;
+    --text-muted:#5b6670;
+    --accent:#1f6f78;
+    --accent-contrast:#ffffff;
+    --good:#2e8b57;   --good-bg:#e1f2e9;
+    --warn:#a56413;   --warn-bg:#faf1de;
+    --bad:#c43d3d;    --bad-bg:#fbe8e8;
+    --font-display:'Barlow Condensed',sans-serif;
+    --font-body:'IBM Plex Sans',sans-serif;
+    --font-mono:'IBM Plex Mono',monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1417;
+      --surface:#1a2126;
+      --surface-2:#222b31;
+      --border:#2e393f;
+      --text:#e8edef;
+      --text-muted:#90a0a8;
+      --accent:#5cc4cf;
+      --accent-contrast:#0f1417;
+      --good:#57bf8b;   --good-bg:#153327;
+      --warn:#e3ab48;   --warn-bg:#3a2c14;
+      --bad:#e2716c;    --bad-bg:#3a1e1d;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1417;
+    --surface:#1a2126;
+    --surface-2:#222b31;
+    --border:#2e393f;
+    --text:#e8edef;
+    --text-muted:#90a0a8;
+    --accent:#5cc4cf;
+    --accent-contrast:#0f1417;
+    --good:#57bf8b;   --good-bg:#153327;
+    --warn:#e3ab48;   --warn-bg:#3a2c14;
+    --bad:#e2716c;    --bad-bg:#3a1e1d;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    margin:0;
+    padding-inline:16px;
+    padding-block:22px 48px;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .wrap{max-width:480px;margin-inline:auto;display:flex;flex-direction:column;gap:16px;}
+
+  header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  header h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:1.6rem;
+    letter-spacing:.02em;
+    margin:0;
+    text-wrap:balance;
+  }
+  header p{margin:2px 0 0;color:var(--text-muted);font-size:.85rem;}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .eyebrow{
+    font-family:var(--font-display);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    font-size:.72rem;
+    color:var(--text-muted);
+  }
+
+  /* readout */
+  .readout-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .sample-flag{
+    font-size:.7rem;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    border-radius:999px;
+    padding:2px 9px;
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+  }
+  .readout-number{
+    font-family:var(--font-mono);
+    font-variant-numeric:tabular-nums;
+    font-weight:600;
+    font-size:clamp(2.6rem,11vw,3.4rem);
+    line-height:1;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+  }
+  .readout-number span.unit{font-size:1.1rem;color:var(--text-muted);font-family:var(--font-body);font-weight:500;}
+  .readout-sub{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .pct{font-family:var(--font-mono);font-variant-numeric:tabular-nums;color:var(--text-muted);font-size:.95rem;}
+  .pill{
+    font-family:var(--font-display);
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    font-weight:600;
+    font-size:.78rem;
+    padding:4px 12px;
+    border-radius:999px;
+  }
+  .pill-good{color:var(--good);background:var(--good-bg);}
+  .pill-warn{color:var(--warn);background:var(--warn-bg);}
+  .pill-bad{color:var(--bad);background:var(--bad-bg);}
+  .pill-neutral{color:var(--text-muted);background:var(--surface-2);}
+
+  /* segmented control */
+  .segmented{display:flex;background:var(--surface-2);border-radius:10px;padding:3px;gap:3px;}
+  .segmented button{
+    flex:1;border:none;background:transparent;color:var(--text-muted);
+    font-family:var(--font-display);font-weight:600;letter-spacing:.03em;
+    padding:8px 6px;border-radius:8px;font-size:.9rem;cursor:pointer;
+  }
+  .segmented button.active{background:var(--accent);color:var(--accent-contrast);}
+
+  /* fields */
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{
+    font-family:var(--font-display);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    font-size:.72rem;
+    color:var(--text-muted);
+  }
+  .field input, .field select{
+    font-family:var(--font-mono);
+    font-size:1rem;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:10px;
+    padding:11px 12px;
+    width:100%;
+  }
+  .field select{font-family:var(--font-body);}
+  .field input:focus, .field select:focus, button:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .preset-row{display:flex;gap:8px;flex-wrap:wrap;}
+  .preset-btn{
+    flex:1;min-width:120px;
+    background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    border-radius:10px;padding:10px;font-family:var(--font-mono);font-size:.9rem;cursor:pointer;
+    text-align:left;
+  }
+  .preset-btn b{font-family:var(--font-display);display:block;font-size:.65rem;letter-spacing:.05em;color:var(--text-muted);font-weight:600;text-transform:uppercase;margin-bottom:2px;}
+  .preset-btn.selected{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);}
+
+  .save-row{display:flex;gap:10px;align-items:flex-end;}
+  .save-row .field{flex:1;}
+  .btn-primary{
+    background:var(--accent);color:var(--accent-contrast);border:none;
+    font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    border-radius:10px;padding:12px 18px;font-size:.85rem;cursor:pointer;white-space:nowrap;
+  }
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+
+  /* history */
+  .history-item{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:11px 0;border-top:1px solid var(--border);cursor:pointer;
+  }
+  .history-item:first-of-type{border-top:none;}
+  .history-left{display:flex;flex-direction:column;gap:2px;min-width:0;}
+  .history-note{font-weight:500;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .history-meta{font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono);}
+  .history-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+  .history-uf{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:.92rem;}
+  .del-btn{
+    background:none;border:none;color:var(--text-muted);font-size:1.1rem;line-height:1;
+    padding:4px 6px;cursor:pointer;border-radius:6px;
+  }
+  .del-btn:hover{color:var(--bad);}
+  .empty-note{color:var(--text-muted);font-size:.88rem;}
+
+  footer{color:var(--text-muted);font-size:.78rem;line-height:1.5;padding-top:6px;}
+  footer code{font-family:var(--font-mono);}
+
+  /* job log paywall */
+  .joblog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .lock-panel{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding:6px 4px 2px;}
+  .lock-icon{width:30px;height:30px;color:var(--text-muted);}
+  .lock-copy{margin:0;color:var(--text-muted);font-size:.9rem;line-height:1.5;max-width:32ch;}
+  .lock-buy{width:100%;text-align:center;}
+  .license-field{width:100%;margin-top:4px;}
+  .license-row{display:flex;gap:8px;}
+  .license-row input{flex:1;text-align:center;}
+  .license-row .btn-primary{flex-shrink:0;}
+  .unlock-status{margin:0;font-size:.82rem;color:var(--bad);text-align:left;}
+  .link-btn{
+    background:none;border:none;color:var(--text-muted);font-size:.78rem;
+    text-decoration:underline;text-underline-offset:2px;cursor:pointer;
+    padding:4px 0;align-self:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>Cap Load Check</h1>
+      <p>Under-load µF test &amp; verdict</p>
+    </div>
+  </header>
+
+  <!-- READOUT -->
+  <section class="card" id="readoutCard">
+    <div class="readout-top">
+      <span class="eyebrow">Actual capacitance</span>
+      <span class="sample-flag" id="sampleFlag">Sample reading</span>
+    </div>
+    <div class="readout-number"><span id="actualUF">43.7</span><span class="unit">µF</span></div>
+    <div class="readout-sub">
+      <span class="pct" id="pctText">97% of rated 45 µF</span>
+      <span class="pill pill-good" id="verdictPill">Good</span>
+    </div>
+  </section>
+
+  <!-- LIVE READING -->
+  <section class="card">
+    <span class="eyebrow">Live reading</span>
+
+    <div class="field">
+      <label>Line frequency</label>
+      <div class="segmented" id="freqToggle">
+        <button type="button" data-freq="60" class="active">60 Hz</button>
+        <button type="button" data-freq="50">50 Hz</button>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="amps">Measured amps</label>
+        <input type="number" inputmode="decimal" id="amps" value="3.95" min="0" step="0.01">
+      </div>
+      <div class="field">
+        <label for="volts">Supply volts (under load)</label>
+        <input type="number" inputmode="decimal" id="volts" value="240" min="0" step="1">
+      </div>
+    </div>
+  </section>
+
+  <!-- RATING -->
+  <section class="card">
+    <span class="eyebrow">Capacitor rating</span>
+
+    <div class="field">
+      <label for="dualPreset">Dual-run preset (optional)</label>
+      <select id="dualPreset">
+        <option value="">— pick a common dual value —</option>
+      </select>
+    </div>
+    <div class="preset-row" id="presetLegRow" hidden>
+      <button type="button" class="preset-btn" id="legA"></button>
+      <button type="button" class="preset-btn" id="legB"></button>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="ratedUF">Rated µF (nameplate)</label>
+        <input type="number" inputmode="decimal" id="ratedUF" value="45" min="0" step="0.1">
+      </div>
+      <div class="field">
+        <label for="ratedV">Rated volts (optional)</label>
+        <input type="number" inputmode="decimal" id="ratedV" value="370" min="0" step="1">
+      </div>
+    </div>
+  </section>
+
+  <!-- JOB LOG (paid feature) -->
+  <section class="card">
+    <div class="joblog-head">
+      <span class="eyebrow">Job log</span>
+      <span class="pill pill-good" id="licenseBadge" hidden>Unlocked</span>
+    </div>
+
+    <div id="jobLogLocked">
+      <div class="lock-panel">
+        <svg class="lock-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/>
+          <path d="M8 11V7.5a4 4 0 0 1 8 0V11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <p class="lock-copy">Tag readings to a unit or customer and pull them back up on the next call. One-time unlock, works offline after that.</p>
+        <a class="btn-primary lock-buy" href="https://nickster2741.gumroad.com/l/capcheck" target="_blank" rel="noopener">Get a license on Gumroad</a>
+        <div class="field license-field">
+          <label for="licenseKeyInput">Already have a key?</label>
+          <div class="license-row">
+            <input type="text" id="licenseKeyInput" placeholder="License key" autocapitalize="characters" autocomplete="off" spellcheck="false">
+            <button type="button" class="btn-primary" id="unlockBtn">Unlock</button>
+          </div>
+          <p class="unlock-status" id="unlockStatus" hidden></p>
+        </div>
+      </div>
+    </div>
+
+    <div id="jobLogUnlocked" hidden>
+      <div class="save-row">
+        <div class="field">
+          <label for="note">Unit / customer tag</label>
+          <input type="text" id="note" placeholder="e.g. 4th &amp; Main — condenser fan">
+        </div>
+        <button type="button" class="btn-primary" id="saveBtn">Save</button>
+      </div>
+      <div id="historyList"><p class="empty-note">No saved readings yet — save one above to build a log.</p></div>
+      <button type="button" class="link-btn" id="relockBtn">Unlink license from this device</button>
+    </div>
+  </section>
+
+  <footer>
+    Formula: µF = (A × 1,000,000) ÷ (2π × Hz × V), the standard running-load test.
+    Verdict: 95–110% of rated = Good, 85–95% or 110–115% = Weak, outside that = Replace.
+    Add this page to your home screen for offline use in the field.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var DUAL_PRESETS = ["35/5","40/5","45/5","50/5","55/5","60/5","65/5","70/5","70/7.5","75/10","80/10","45/7.5","55/7.5","60/7.5"];
+  var HISTORY_KEY = "capcheck_history_v1";
+  var MAX_HISTORY = 100;
+
+  // Gumroad product id for Cap Load Check — Job Log (from the product's API/license settings)
+  var GUMROAD_PRODUCT_ID = "RZOqE55D4WRLd_7Qk0A62w==";
+  var LICENSE_KEY_STORAGE = "capcheck_license_key";
+
+  var els = {
+    dualPreset: document.getElementById("dualPreset"),
+    presetLegRow: document.getElementById("presetLegRow"),
+    legA: document.getElementById("legA"),
+    legB: document.getElementById("legB"),
+    ratedUF: document.getElementById("ratedUF"),
+    ratedV: document.getElementById("ratedV"),
+    freqToggle: document.getElementById("freqToggle"),
+    amps: document.getElementById("amps"),
+    volts: document.getElementById("volts"),
+    note: document.getElementById("note"),
+    saveBtn: document.getElementById("saveBtn"),
+    historyList: document.getElementById("historyList"),
+    actualUF: document.getElementById("actualUF"),
+    pctText: document.getElementById("pctText"),
+    verdictPill: document.getElementById("verdictPill"),
+    sampleFlag: document.getElementById("sampleFlag"),
+    licenseBadge: document.getElementById("licenseBadge"),
+    jobLogLocked: document.getElementById("jobLogLocked"),
+    jobLogUnlocked: document.getElementById("jobLogUnlocked"),
+    licenseKeyInput: document.getElementById("licenseKeyInput"),
+    unlockBtn: document.getElementById("unlockBtn"),
+    unlockStatus: document.getElementById("unlockStatus"),
+    relockBtn: document.getElementById("relockBtn"),
+  };
+
+  var state = { freq: 60, isSample: true, selectedLeg: null };
+
+  // ---- populate dual presets ----
+  DUAL_PRESETS.forEach(function(p){
+    var opt = document.createElement("option");
+    opt.value = p;
+    opt.textContent = p + " µF";
+    els.dualPreset.appendChild(opt);
+  });
+
+  els.dualPreset.addEventListener("change", function(){
+    var val = els.dualPreset.value;
+    if(!val){ els.presetLegRow.hidden = true; return; }
+    var parts = val.split("/");
+    els.legA.innerHTML = "<b>Herm / Comp</b>" + parts[0] + " µF";
+    els.legB.innerHTML = "<b>Fan</b>" + parts[1] + " µF";
+    els.legA.dataset.value = parts[0];
+    els.legB.dataset.value = parts[1];
+    els.legA.classList.remove("selected");
+    els.legB.classList.remove("selected");
+    els.presetLegRow.hidden = false;
+  });
+
+  [els.legA, els.legB].forEach(function(btn){
+    btn.addEventListener("click", function(){
+      els.ratedUF.value = btn.dataset.value;
+      els.legA.classList.toggle("selected", btn === els.legA);
+      els.legB.classList.toggle("selected", btn === els.legB);
+      markReal();
+      compute();
+    });
+  });
+
+  els.freqToggle.addEventListener("click", function(e){
+    var btn = e.target.closest("button[data-freq]");
+    if(!btn) return;
+    state.freq = Number(btn.dataset.freq);
+    Array.prototype.forEach.call(els.freqToggle.children, function(b){
+      b.classList.toggle("active", b === btn);
+    });
+    markReal();
+    compute();
+  });
+
+  [els.ratedUF, els.ratedV, els.amps, els.volts].forEach(function(input){
+    input.addEventListener("input", function(){
+      markReal();
+      compute();
+    });
+  });
+
+  function markReal(){
+    if(state.isSample){
+      state.isSample = false;
+      els.sampleFlag.hidden = true;
+    }
+  }
+
+  function classify(pct){
+    if(pct >= 95 && pct <= 110) return {label:"Good", cls:"pill-good"};
+    if((pct >= 85 && pct < 95) || (pct > 110 && pct <= 115)) return {label:"Weak", cls:"pill-warn"};
+    return {label:"Replace", cls:"pill-bad"};
+  }
+
+  function compute(){
+    var amps = parseFloat(els.amps.value);
+    var volts = parseFloat(els.volts.value);
+    var rated = parseFloat(els.ratedUF.value);
+    var k = 1000000 / (2 * Math.PI * state.freq);
+
+    if(!isFinite(amps) || !isFinite(volts) || volts <= 0){
+      els.actualUF.textContent = "—";
+      els.pctText.textContent = "Enter amps and volts";
+      setPill(null);
+      els.saveBtn.disabled = true;
+      return null;
+    }
+
+    var actual = (amps * k) / volts;
+    els.actualUF.textContent = actual.toFixed(1);
+
+    var result = { actual: actual, pct: null, verdict: null };
+
+    if(isFinite(rated) && rated > 0){
+      var pct = (actual / rated) * 100;
+      result.pct = pct;
+      var v = classify(pct);
+      result.verdict = v.label;
+      els.pctText.textContent = pct.toFixed(0) + "% of rated " + rated + " µF";
+      setPill(v);
+    } else {
+      els.pctText.textContent = "Enter rated µF for a verdict";
+      setPill(null);
+    }
+
+    els.saveBtn.disabled = false;
+    return result;
+  }
+
+  function setPill(v){
+    els.verdictPill.className = "pill " + (v ? v.cls : "pill-neutral");
+    els.verdictPill.textContent = v ? v.label : "—";
+  }
+
+  // ---- history ----
+  function loadHistory(){
+    try{
+      return JSON.parse(localStorage.getItem(HISTORY_KEY)) || [];
+    }catch(e){ return []; }
+  }
+  function saveHistory(list){
+    try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); }catch(e){}
+  }
+
+  function renderHistory(){
+    var list = loadHistory();
+    if(list.length === 0){
+      els.historyList.innerHTML = '<p class="empty-note">No saved readings yet — save one above to build a log.</p>';
+      return;
+    }
+    els.historyList.innerHTML = "";
+    list.slice().reverse().forEach(function(entry){
+      var row = document.createElement("div");
+      row.className = "history-item";
+      var pillCls = entry.verdict === "Good" ? "pill-good" : entry.verdict === "Weak" ? "pill-warn" : entry.verdict === "Replace" ? "pill-bad" : "pill-neutral";
+      row.innerHTML =
+        '<div class="history-left">' +
+          '<span class="history-note">' + escapeHtml(entry.note || "Unlabeled") + '</span>' +
+          '<span class="history-meta">' + entry.dateStr + ' · ' + entry.freq + 'Hz</span>' +
+        '</div>' +
+        '<div class="history-right">' +
+          '<span class="history-uf">' + entry.actualUF + ' µF</span>' +
+          (entry.verdict ? '<span class="pill ' + pillCls + '">' + entry.verdict + '</span>' : '') +
+          '<button type="button" class="del-btn" data-id="' + entry.id + '" aria-label="Delete entry">×</button>' +
+        '</div>';
+      row.addEventListener("click", function(e){
+        if(e.target.closest(".del-btn")) return;
+        loadEntry(entry);
+      });
+      row.querySelector(".del-btn").addEventListener("click", function(e){
+        e.stopPropagation();
+        deleteEntry(entry.id);
+      });
+      els.historyList.appendChild(row);
+    });
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function loadEntry(entry){
+    els.ratedUF.value = entry.ratedUF;
+    els.ratedV.value = entry.ratedV || "";
+    els.amps.value = entry.amps;
+    els.volts.value = entry.volts;
+    els.note.value = entry.note || "";
+    state.freq = entry.freq;
+    Array.prototype.forEach.call(els.freqToggle.children, function(b){
+      b.classList.toggle("active", Number(b.dataset.freq) === entry.freq);
+    });
+    markReal();
+    compute();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function deleteEntry(id){
+    var list = loadHistory().filter(function(e){ return e.id !== id; });
+    saveHistory(list);
+    renderHistory();
+  }
+
+  // ---- job log unlock (Gumroad license) ----
+  function verifyLicense(key){
+    var body = new URLSearchParams();
+    body.set("product_id", GUMROAD_PRODUCT_ID);
+    body.set("license_key", key);
+    body.set("increment_uses_count", "false");
+    return fetch("https://api.gumroad.com/v2/licenses/verify", {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: body.toString()
+    }).then(function(res){ return res.json(); });
+  }
+
+  function showUnlockStatus(msg){
+    els.unlockStatus.textContent = msg;
+    els.unlockStatus.hidden = !msg;
+  }
+
+  function applyLicenseState(unlocked){
+    els.jobLogLocked.hidden = unlocked;
+    els.jobLogUnlocked.hidden = !unlocked;
+    els.licenseBadge.hidden = !unlocked;
+    if(unlocked) renderHistory();
+  }
+
+  els.unlockBtn.addEventListener("click", function(){
+    var key = els.licenseKeyInput.value.trim();
+    if(!key){ showUnlockStatus("Enter your license key."); return; }
+    els.unlockBtn.disabled = true;
+    els.unlockBtn.textContent = "Checking…";
+    showUnlockStatus("");
+    verifyLicense(key).then(function(data){
+      if(data && data.success){
+        try{ localStorage.setItem(LICENSE_KEY_STORAGE, key); }catch(e){}
+        applyLicenseState(true);
+      } else {
+        showUnlockStatus((data && data.message) || "That license key isn't valid.");
+      }
+    }).catch(function(){
+      showUnlockStatus("Couldn't reach the license server. Connect to the internet once to unlock — it works offline after that.");
+    }).finally(function(){
+      els.unlockBtn.disabled = false;
+      els.unlockBtn.textContent = "Unlock";
+    });
+  });
+
+  els.relockBtn.addEventListener("click", function(){
+    if(!confirm("Remove this license from the current device? You can unlock again with the same key.")) return;
+    try{ localStorage.removeItem(LICENSE_KEY_STORAGE); }catch(e){}
+    els.licenseKeyInput.value = "";
+    applyLicenseState(false);
+  });
+
+  els.saveBtn.addEventListener("click", function(){
+    var result = compute();
+    if(!result) return;
+    var list = loadHistory();
+    var now = new Date();
+    list.push({
+      id: String(Date.now()) + Math.random().toString(36).slice(2,7),
+      dateStr: now.toLocaleDateString(undefined,{month:"short",day:"numeric"}) + " " + now.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}),
+      note: els.note.value.trim(),
+      freq: state.freq,
+      amps: els.amps.value,
+      volts: els.volts.value,
+      ratedUF: els.ratedUF.value,
+      ratedV: els.ratedV.value,
+      actualUF: result.actual.toFixed(1),
+      pct: result.pct !== null ? Math.round(result.pct) : null,
+      verdict: result.verdict
+    });
+    if(list.length > MAX_HISTORY) list = list.slice(list.length - MAX_HISTORY);
+    saveHistory(list);
+    els.note.value = "";
+    renderHistory();
+  });
+
+  compute();
+  applyLicenseState(!!(function(){
+    try{ return localStorage.getItem(LICENSE_KEY_STORAGE); }catch(e){ return null; }
+  })());
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){
+      navigator.serviceWorker.register("sw.js").catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
