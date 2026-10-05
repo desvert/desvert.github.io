@@ -22,8 +22,6 @@ The Cisco Catalyst WS-C2960C-12PC-L was the answer. Twelve FastEthernet PoE port
 
 This is also where the lab starts looking like something you'd study for CCNA on, because that's exactly what it is. The switch config in this post is real cert-prep, not simulation.
 
----
-
 ## Getting Console Access
 
 The Catalyst has no out-of-band management until it's configured. That means a USB console cable before anything else. The FTDI FT232-based cable works; `picocom` is the cleaner tool for serial console work compared to `screen`, with explicit baud rate flags and cleaner exit behavior.
@@ -39,8 +37,6 @@ picocom -b 9600 /dev/ttyUSB0
 ```
 
 Baud rate is 9600 8N1, standard for IOS console.
-
----
 
 ## Baseline Configuration
 
@@ -58,8 +54,6 @@ banner motd ^Authorized access only^
 
 Console and VTY lines locked down with `login local`, a named user account, and SSH v2 only. IP default gateway set to `192.168.10.1` (the C7) so the management SVI can reach the rest of the network.
 
----
-
 ## The SSH Crypto Problem
 
 Modern OpenSSH rejects IOS 12.2's algorithms by default. Attempting to SSH into the switch produced a connection failure with no useful message from the client side. Three separate flags were required, each surfacing as a distinct error:
@@ -76,26 +70,22 @@ Host c7sw
 
 The key exchange error came first, then the host key algorithm rejection, then the cipher mismatch. Each one required a separate attempt to surface. The switch isn't broken. IOS 12.2 predates modern crypto standards by over a decade. The `~/.ssh/config` entry makes the workaround permanent so it doesn't need to be remembered.
 
----
-
 ## VLAN Design
 
 VLAN 1 was skipped entirely. It's the default native VLAN on 802.1Q trunks, which makes it the outer tag in a double-tagging attack against any port carrying tagged traffic. Easier to leave it empty than to harden against it.
 
 The scheme:
 
-- **VLAN 10** — trusted LAN (`192.168.10.x`), wired ports and `ether` WiFi
-- **VLAN 20** — lab (`192.168.20.x`), `labnet` WiFi, ESP32s and sensors
-- **VLAN 30** — reserved stub, no devices yet
-- **VLAN 99** — black hole, all unallocated ports land here with no routing and no internet access
+- VLAN 10: trusted LAN (`192.168.10.x`), wired ports and `ether` WiFi
+- VLAN 20: lab (`192.168.20.x`), `labnet` WiFi, ESP32s and sensors
+- VLAN 30: reserved stub, no devices yet
+- VLAN 99: black hole, all unallocated ports land here with no routing and no internet access
 
 VLAN 99 is a deliberate security posture. An empty port on an unmanaged switch is an open door. An empty port assigned to VLAN 99 and shut down is not.
 
----
-
 ## Configuring the Switch
 
-VLANs created, ports named and assigned. All unallocated FastEthernet ports assigned to VLAN 99 and shut down. `Fa0/1` configured as a VLAN 10 access port for `argus` -- the t620 thin client that will run the monitoring stack -- with `Fa0/2` reserved as its dedicated capture interface. `Gi0/1` configured as an 802.1Q trunk to the C7 carrying VLANs 10 and 20. Management SVI moved from VLAN 1 to VLAN 10 at `192.168.10.11`.
+VLANs created, ports named and assigned. All unallocated FastEthernet ports assigned to VLAN 99 and shut down. `Fa0/1` configured as a VLAN 10 access port for `argus`, the t620 thin client that will run the monitoring stack, with `Fa0/2` reserved as its dedicated capture interface. `Gi0/1` configured as an 802.1Q trunk to the C7 carrying VLANs 10 and 20. Management SVI moved from VLAN 1 to VLAN 10 at `192.168.10.11`.
 
 ```
 vlan 10
@@ -131,8 +121,6 @@ interface vlan 10
 ip default-gateway 192.168.10.1
 ```
 
----
-
 ## The C7 Factory Reset
 
 Configuring the C7's LAN ports to pass tagged VLAN traffic hit the same failure mode described in [Post 1](https://desvert.github.io/blog/2026/04/26/homelab-1-taking-control.html): manipulating the internal bridge via `swconfig` brought down all ports simultaneously. Another factory reset.
@@ -140,8 +128,6 @@ Configuring the C7's LAN ports to pass tagged VLAN traffic hit the same failure 
 The difference from Post 1: the lesson held. WiFi was already enabled as a fallback before any switch configuration was attempted. Access to the C7 survived the reset and reconfiguration proceeded without needing physical access to the router.
 
 After the reset, the decision was made to stop fighting the C7's internal switch entirely. The C7 becomes a pure router: one trunk port out of LAN3 to the Catalyst's `Gi0/1`. The Catalyst handles all switching, which is what a managed switch is for.
-
----
 
 ## The VLAN Migration
 
@@ -157,8 +143,6 @@ sudo systemctl disable wpa_supplicant
 ```
 
 A wired server has no business having WiFi enabled. The second surprise was simpler: Minecraft port forwarding was closed entirely. Every player is on the local network. There's no reason to leave 19132/UDP open to the internet.
-
----
 
 ## SPAN
 
@@ -186,15 +170,11 @@ sudo tcpdump -i capture0
 
 Traffic appeared immediately.
 
----
-
 ## What Came Out of Building It
 
 The SSH crypto problem on IOS 12.2 took longer than it should have because the OpenSSH error messages are not specific about which negotiation step failed. The fix, once the flags were known, was a single `~/.ssh/config` block. Check `ssh -vvv` output early rather than guessing at which algorithm is the problem.
 
 The C7 factory reset was frustrating but not a surprise. Same failure mode as Post 1, triggered the same way. The difference was that the WiFi fallback was in place before it happened. The architectural outcome was worth it: the C7 does routing, the Catalyst does switching, and each piece does one job cleanly.
-
----
 
 ## Where This Is Going
 

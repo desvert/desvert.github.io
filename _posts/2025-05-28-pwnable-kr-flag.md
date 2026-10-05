@@ -93,7 +93,7 @@ va       true
 
 My takeaway from `radare2` is that I will need to spend some time learning how to use it effectively, but it looks like an awesome tool.
 
-I started looking for some clues from people that have done this CTF before, but wasn't getting any hits in the Discord servers I lurk in. So I found a walkthrough, and quickly found that I had overlooked a **big** clue at the beginning: the `strings` output that "this file is *packed* with UPX..." coupled with the clue given at the beginning "Papa brought me a *packed* present!" Finally I had a jumping-off point! I set the walkthrough aside, and started digging some more. A quick search led me to https://upx.github.io, where I downloaded the `upx` tool. 
+I started looking for some clues from people that have done this CTF before, but wasn't getting any hits in the Discord servers I lurk in. So I found a walkthrough, and quickly found that I had overlooked a big clue at the beginning: the `strings` output that "this file is *packed* with UPX..." coupled with the clue given at the beginning "Papa brought me a *packed* present!" Finally I had a jumping-off point! I set the walkthrough aside, and started digging some more. A quick search led me to https://upx.github.io, where I downloaded the `upx` tool. 
 ```
 $ upx -h
                        Ultimate Packer for eXecutables
@@ -163,4 +163,4 @@ End of assembler dump.
 (gdb)
 ```
 
-And there is the flag, revealed!
+And there's the flag.

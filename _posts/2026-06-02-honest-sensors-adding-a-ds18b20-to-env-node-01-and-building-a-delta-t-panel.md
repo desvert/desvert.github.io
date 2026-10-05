@@ -22,8 +22,6 @@ excerpt: ""
 
 That's what this post is about. A DS18B20 waterproof temperature sensor from the HVAC testbed parts stock, added to `env-node-01`, an outdoor deployment, and a Delta T panel that turned out to be more useful than expected.
 
----
-
 ## The Calibration Backstory
 
 During the initial `env-node-01` build, the thermistor went through a real calibration process. Not assumed datasheet constants: an HVAC probe from the work van held next to the sensor, two stable data points taken at different temperatures, and a two-point Beta calculation done live.
@@ -39,8 +37,6 @@ The math produces three constants that go into the firmware:
 Getting there wasn't clean. The ADC resistance formula was inverted in the first pass: `raw / (ADC_MAX - raw)` instead of the correct `(ADC_MAX - raw) / raw`. That produced readings that were directionally backwards. Once that was fixed, the first Beta estimate was still off because the assumed 10kΩ nominal resistance at 25°C didn't match the actual thermistor. The two-point method resolved it by calculating Beta from measured data rather than assuming it.
 
 The calibration held up across months of runtime. But "held up" based on what? The numbers looked reasonable. The trend lines tracked with ambient changes. That's not the same as confirmed accurate.
-
----
 
 ## The DS18B20
 
@@ -61,8 +57,6 @@ The DS18B20 wired to GPIO5 with a 5kΩ pull-up resistor between 3.3V and the dat
 Wiring the resistor in series between the data wire and GPIO5 is a common mistake. The sensor won't respond.
 
 ![Photo of DS18B20 wired to the ESP32 development board showing the pull-up resistor placement](/assets/images/honest-sensors-wiring-showing-resistor-placement.jpg)
-
----
 
 ## Firmware
 
@@ -96,15 +90,11 @@ if (tempC == DEVICE_DISCONNECTED_C) {
 
 Once the firmware was confirmed working on the development board, the DS18B20 was integrated into `env-node-01` directly. The development board was a test fixture, not a permanent second node.
 
----
-
 ## Side by Side
 
 Both sensors in the same environment, readings stabilized. DS18B20: 22.06°C. Thermistor: 22.06°C.
 
 The exact match is worth a moment. 22.06°C is also `TEMPERATURE_NOMINAL`: the reference temperature used in the thermistor calibration constants. That's coincidence, not circularity; the DS18B20 is reporting its own independent measurement. But it meant the validation result was unambiguous. Two sensors, same reading, same temperature the thermistor was calibrated against. The calibration held.
-
----
 
 ## Outside
 
@@ -117,8 +107,6 @@ clamp_min(clamp_max(mqtt_consumer_fahrenheit{topic="labnet/sensors/env/01/temper
 The clamp suppresses disconnect spikes on both ends without masking legitimate readings. An unconnected DS18B20 returns -127°C (-196°F), well outside the clamp range, so it shows as -20°F rather than a dramatic spike that distorts the panel scale.
 
 The indoor thermistor climbed slowly as the evening progressed. The outdoor panel dropped from ~72°F to ~62°F.
-
----
 
 ## Delta T
 
@@ -135,8 +123,6 @@ The panel showed a 14.4°F delta with the gap widening in real time.
 ![Screenshot of the Delta T Grafana panel showing the 14.4°F gap with trend graph](/assets/images/honest-sensors-grafana-delta-t.webp)
 
 That's a number with meaning beyond the homelab. A 14°F indoor-outdoor differential is exactly the kind of signal a real building automation system uses to make economizer decisions: when the outside air is cool enough relative to the return air temperature, you switch from mechanical cooling to free cooling. The HVAC testbed this parts stock was purchased for will eventually compute that logic. This is the first glimpse of what it will look like.
-
----
 
 ## What Came Out of Building It
 

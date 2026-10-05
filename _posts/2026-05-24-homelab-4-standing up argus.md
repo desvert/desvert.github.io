@@ -19,13 +19,9 @@ excerpt: ""
 
 The HP t620 thin client arrived in a box without a storage drive, without an OS, and without a power cord. That's what used hardware looks like, and it's also why it cost what it did. Once the missing pieces arrived separately, the plan was to turn it into a dedicated monitoring node: Rocky Linux on bare metal, a full metrics pipeline feeding Grafana dashboards, and eventually a security layer watching everything that crosses the network. This post covers the first half of that: getting Rocky installed, wiring together Prometheus, Grafana, Mosquitto, Telegraf, and node_exporter, and setting up Node-RED to push temperature alerts to a phone.
 
----
-
 ## The Hardware
 
 The t620 is a small-form-factor thin client from HP. 4GB RAM, no moving parts, passive cooling. For a monitoring node that runs continuously and does no heavy lifting, it's close to ideal. The M.2 slot on the motherboard is SATA only, not NVMe. That distinction matters when ordering a drive; an NVMe M.2 will physically fit but the t620 won't see it. One additional hardware note: the M.2 retaining screw is HP's proprietary M1.6 Torx, not the standard M2 used by every screw kit in circulation. Tape held the drive seated long enough to complete the install while the right screw was tracked down.
-
----
 
 ## Getting Rocky On It
 
@@ -50,8 +46,6 @@ sudo nmcli connection up enp1s0
 
 Confirmed persistent across two reboots before moving on.
 
----
-
 ## The Data Directory Convention
 
 Before installing any service, the directory structure goes in first:
@@ -62,29 +56,21 @@ sudo mkdir -p /mnt/data/{prometheus,grafana,loki,mosquitto/{data,log},telegraf}
 
 Every service is configured to write its data to `/mnt/data` from day one. This keeps the OS partition clean and makes the monitoring stack effectively portable. The OS is disposable; the data isn't.
 
----
-
 ## Prometheus
 
 Prometheus isn't in the Rocky repos, so it's a binary install from upstream. Version 3.5.3 LTS. System user, systemd unit, 30-day retention, data at `/mnt/data/prometheus`, port 9090.
 
 Prometheus 3.x no longer ships `consoles/` or `console_libraries/` directories. Any install step that copies those can be skipped.
 
----
-
 ## Grafana
 
 Official RPM repo. Port 3000, data at `/mnt/data/grafana`. Prometheus added as a data source and confirmed green. Dashboard 1860 (Node Exporter Full) imported from grafana.com. Once node_exporter is running on both hosts, both `argus` and `thing` appear in the instance dropdown without any additional configuration.
 
-![ Screenshot of Grafana dashboard 1860 showing both argus and thing in the instance dropdown](/assets/images/homelab-4-grafana-node-exporter.png)
-
----
+![Screenshot of Grafana dashboard 1860 showing both argus and thing in the instance dropdown](/assets/images/homelab-4-grafana-node-exporter.png)
 
 ## node_exporter
 
 Installed on both `argus` and `thing`. On `thing`, a `ufw` rule scopes access to `192.168.10.0/24:9100`. Host metrics don't need to be reachable from anywhere else. Both targets confirmed green in the Prometheus targets view.
-
----
 
 ## Mosquitto
 
@@ -105,8 +91,6 @@ Port 1883, persistence and logs to `/mnt/data/mosquitto`, no anonymous connectio
 
 One more: Mosquitto passwords can't contain `!` when set via shell commands. The shell interprets it as a history expansion event even inside single quotes. Use a different character.
 
----
-
 ## Telegraf
 
 InfluxData repo. Version 1.38.3. The correct GPG key is `influxdata-archive.key`, not `influxdata-archive_compat.key`. The `_compat` variant causes a silent install failure: `dnf install` exits cleanly but the package isn't actually there. Running `telegraf --version` after install is the right verification step.
@@ -120,8 +104,6 @@ Telegraf is configured as an MQTT consumer on `labnet/sensors/#` and exposes a P
 ```
 
 Both the `argus` node_exporter target and the Telegraf target confirmed green at `http://192.168.10.150:9090/targets`.
-
----
 
 ## Node-RED and the Alert Flow
 
@@ -138,15 +120,11 @@ Setting up the Telegram bot takes about two minutes via BotFather. Get a token, 
 ![Screenshot of the Node-RED flow showing the MQTT In, switch, and two parallel branches](/assets/images/homelab-post-4-node-red-mqtt-flow.png)
 ![Screenshot of a Telegram alert message received from the Argus Alerts bot ](/assets/images/homelab-4-telegram-alert-message.jpg)
 
----
-
 ## What Came Out of Building It
 
 Two failures had the same shape: the service starts, the install looks clean, but something is silently wrong. The Telegraf GPG key produced an apparent success from `dnf` with no actual package installed. The Mosquitto `passwd` ownership issue let the broker start and accept connections while rejecting all authentication without logging anything useful. In both cases `journalctl` was the tool that made the problem visible, not the install output.
 
 The Node-RED alert architecture came out of a debugging session where the Telegram message wasn't sending when the log branch ran correctly. Downstream nodes in a flow shouldn't depend on upstream side effects. Independent branches are more reliable and easier to extend.
-
----
 
 ## Where This Is Going
 

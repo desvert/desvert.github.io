@@ -19,13 +19,9 @@ excerpt: ""
 
 `capture0` has been live since Post 3. The SPAN session on the Catalyst is copying everything that crosses `Fa0/1` to `Fa0/2`, and the USB NIC on `argus` is receiving it. Up until now, `tcpdump` was the only thing listening. This post adds the actual security layer: Zeek parsing that traffic into structured logs, Suricata running 50,000 rules against it, Fluent Bit shipping those logs to Loki, and Grafana making all of it queryable alongside the host metrics already in place.
 
----
-
 ## Why Both Zeek and Suricata
 
-They answer different questions. Suricata is signature-based: it fires when traffic matches a known bad pattern. Zeek doesn't alert; it structures everything it sees into typed log files. Connection metadata, DNS queries, HTTP transactions, MQTT publishes, SSL handshakes -- all parsed and written whether or not anything looks suspicious. Zeek tells you what happened. Suricata tells you when something matched a rule. Together they cover both angles: reactive alerting and the structured history needed to investigate it.
-
----
+They answer different questions. Suricata is signature-based: it fires when traffic matches a known bad pattern. Zeek doesn't alert; it structures everything it sees into typed log files. Connection metadata, DNS queries, HTTP transactions, MQTT publishes, SSL handshakes, all parsed and written whether or not anything looks suspicious. Zeek tells you what happened. Suricata tells you when something matched a rule. Together they cover both angles: reactive alerting and the structured history needed to investigate it.
 
 ## Zeek
 
@@ -74,8 +70,6 @@ Confirmed writing after startup: `conn.log`, `dns.log`, `http.log`, `ssl.log`, a
 
 ![Screenshot of mqtt_publish.log filtered with awk showing timestamp, topic, and JSON payload columns - both temperature and temperature_out topics visible](/assets/images/homelab-post-5-mqtt-publish-log.png)
 
----
-
 ## Suricata
 
 Available natively via EPEL. Version 7.0.13.
@@ -108,8 +102,6 @@ sudo suricata-update
 ```
 
 The hot-reload matters. Restarting Suricata to update rules drops traffic during the restart window. `suricatasc -c reload-rules` tells the running process to swap in the new ruleset without stopping, communicating over a Unix socket at `/var/run/suricata/suricata-command.socket`. Confirm the socket is active before relying on the cron: `sudo suricatasc -c version` should return a response. If the socket isn't there, the reload half of the cron silently fails and rules only update on next restart.
-
----
 
 ## Fluent Bit
 
@@ -174,8 +166,6 @@ Config at `/etc/fluent-bit/fluent-bit.conf`:
 
 Three Zeek logs (`conn.log`, `dns.log`, `mqtt_publish.log`) tagged `zeek.*`, and Suricata's `eve.json` tagged `suricata`. Each input uses the json parser and a 5-second refresh interval, with `Skip_Long_Lines` on to handle Zeek's occasionally wide log lines. Two separate OUTPUT blocks ship to Loki on localhost: one matching `zeek.*` with a `job=zeek` label, one matching `suricata` with `job=suricata`. Keeping them separate means Grafana queries can filter cleanly by source.
 
----
-
 ## Loki
 
 No native Rocky 9 RPM. Docker, `grafana/loki:latest`. Config at `/mnt/data/loki/loki-config.yaml`, data at `/mnt/data/loki`, port 3100.
@@ -197,8 +187,6 @@ Added as a Grafana data source pointing at `http://127.0.0.1:3100`, confirmed gr
 {job="zeek.mqtt"}
 ```
 
----
-
 ## The Dashboard
 
 Five panels, two columns. Left column: time series charts showing rates over time, covering MQTT Messages / Interval, Suricata Alerts / Interval, and Suricata Flow Events / Interval. Right column: log tables showing raw entries for Zeek MQTT Activity and Suricata Recent Alerts. The pairing is deliberate: the rate graphs show the shape of activity over time, the log tables give you the actual events when something warrants a closer look.
@@ -209,15 +197,11 @@ Dashboard named "Zeek & Suricata", 1-minute refresh, favorited.
 
 ![Screenshot of the Zeek & Suricata Grafana dashboard ](/assets/images/homelab-post-5-grafana-zeek-suricata.png)
 
----
-
 ## What Came Out of Building It
 
 The Zeek and Suricata installs were each straightforward once the right deployment path was clear: Docker for Zeek, native EPEL for Suricata. The friction in this post was almost entirely in the plumbing: getting Fluent Bit configured correctly, making sure Loki was reachable, confirming data was flowing through each stage before moving to the next.
 
 The `suricatasc` hot-reload is worth understanding even if the implementation is a one-line cron entry. On a sensor that runs continuously, restarting the process to update rules creates a gap. The Unix socket approach eliminates that gap.
-
----
 
 ## Where This Is Going
 

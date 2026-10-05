@@ -15,6 +15,7 @@ _site/
 *.swp
 *.swo
 
-# ignore Drafts & notes
+# ignore Drafts & notes, version 1
 drafts/
 *.notes
+_posts/v1/

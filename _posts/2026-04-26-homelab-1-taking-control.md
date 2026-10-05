@@ -21,8 +21,6 @@ The solution wasn't to replace the Verizon box. Fighting with the cellular modem
 
 This is the first post in a series documenting that build. The plan eventually involves a Cisco Catalyst managed switch, a thin client running a monitoring stack, IoT sensors on an isolated VLAN, and a security layer that can actually see what's happening on the network. This post covers the foundation: the routing layer, DNS filtering, and the problems that came up along the way.
 
----
-
 ## The Architecture
 
 The setup is straightforward on paper. The Verizon box (`192.168.0.1`) handles the WAN connection and the family WiFi. The C7 sits behind it as a downstream router, handling routing, firewall rules, DNS, DHCP, and eventually VLANs. The C7's WAN port connects to one of the Verizon box's LAN ports. Everything on the C7's LAN side is invisible to the Verizon network except through explicit port forwarding.
@@ -32,18 +30,16 @@ Double-NAT has a reputation for causing problems with gaming, VoIP, and port for
 ```
 Internet
     |
-Verizon cellular gateway (192.168.0.1) -- family WiFi, cellular WAN
+Verizon cellular gateway (192.168.0.1), family WiFi, cellular WAN
     |
 C7 WAN
 C7 LAN (192.168.1.1)
     |
     +-- LAN1: thing (Ubuntu 24.04, 192.168.1.111)
     +-- LAN2: quantum (Dell + dock, 192.168.1.222)
-    +-- ether  (5GHz WiFi -- trusted devices)
-    +-- labnet (2.4GHz WiFi -- IoT/ESP32, future VLAN 20)
+    +-- ether  (5GHz WiFi, trusted devices)
+    +-- labnet (2.4GHz WiFi, IoT/ESP32, future VLAN 20)
 ```
-
----
 
 ## Flashing OpenWrt
 
@@ -65,11 +61,9 @@ The session drops when the router reboots. Wait a few minutes, ping `192.168.1.1
 
 If you're running OpenWrt 25.x, the firewall subsystem is `nftables`, not `iptables`. A lot of older documentation and configuration examples reference `iptables` commands that won't work. That matters before you start troubleshooting rules that appear to apply and silently don't.
 
----
-
 ## Getting SSH Working from `quantum`
 
-`quantum` is a Dell laptop with no native ethernet port — it connects through a USB docking station. That detail created more friction than expected.
+`quantum` is a Dell laptop with no native ethernet port, it connects through a USB docking station. That detail created more friction than expected.
 
 `dhclient` is gone from Ubuntu 24.04. The command I reached for to bring up the ethernet interface doesn't exist anymore. The replacement is `networkctl`:
 
@@ -77,7 +71,7 @@ If you're running OpenWrt 25.x, the firewall subsystem is `nftables`, not `iptab
 sudo networkctl up enp1s0
 ```
 
-The second problem was subtler. WSL doesn't expose the physical ethernet adapter — it gets its own virtual interface. SSH from inside WSL was going out through WiFi and hitting the Verizon network instead of the C7's LAN. The fix was to SSH from PowerShell instead, binding to the right source IP:
+The second problem was subtler. WSL doesn't expose the physical ethernet adapter, it gets its own virtual interface. SSH from inside WSL was going out through WiFi and hitting the Verizon network instead of the C7's LAN. The fix was to SSH from PowerShell instead, binding to the right source IP:
 
 ```bash
 ssh -b 192.168.1.136 mind@192.168.1.111
@@ -91,8 +85,6 @@ command = ip route add 192.168.1.0/24 via 172.24.128.1
 ```
 
 That survives restarts and makes `ssh thing` work from WSL as expected.
-
----
 
 ## The TCP Wrappers Problem
 
@@ -110,8 +102,6 @@ sshd: 192.168.0. 192.168.1.
 ```
 
 TCP wrappers evaluate live. No restart needed, and the connection worked immediately.
-
----
 
 ## Pi-hole: Why Not Docker
 
@@ -139,27 +129,21 @@ Upstream DNS pointed at the C7 (`192.168.1.1`) with the Verizon gateway as a fal
 
 The Docker detour wasn't wasted. Working through each failure made it clear exactly why this environment was incompatible with that approach: the musl libc behavior, the Pi-hole v6 changes, and the C7's firewall posture all stacked against it.
 
----
-
 ## WiFi
 
-The C7's radios stayed off until the wired setup was stable. Enabling WiFi before any switch configuration gives you a fallback access method that doesn't depend on the wired bridge being intact — a lesson that came from experience, described below.
+The C7's radios stayed off until the wired setup was stable. Enabling WiFi before any switch configuration gives you a fallback access method that doesn't depend on the wired bridge being intact, a lesson that came from experience, described below.
 
 Two SSIDs: `ether` on 5GHz for trusted devices, `labnet` on 2.4GHz for IoT and ESP32s. Both WPA2. The band split is intentional: ESP32s don't support 5GHz, and keeping IoT devices on 2.4GHz means the radio assignment and the future VLAN assignment will line up naturally. WPA3 was considered for `labnet` and skipped. ESP32 WPA3 support is inconsistent across firmware versions, and WPA2 is adequate for a network that will sit behind a firewall anyway.
 
----
-
 ## What Came Out of Building It
 
-An early attempt at switch configuration — adjusting VLAN assignments via swconfig before the Catalyst arrived — caused complete loss of connectivity across all ports. Not one port, all of them. The C7 required two factory resets before the bridge was back in a working state. The lesson landed early: enable WiFi in software before touching anything on the switch side, so there's a fallback that doesn't depend on the wired bridge. That's now a standard step before any switch work — and it came in handy later when the real VLAN migration hit its first wall.
+An early attempt at switch configuration, adjusting VLAN assignments via swconfig before the Catalyst arrived, caused complete loss of connectivity across all ports. Not one port, all of them. The C7 required two factory resets before the bridge was back in a working state. The lesson landed early: enable WiFi in software before touching anything on the switch side, so there's a fallback that doesn't depend on the wired bridge. That's now a standard step before any switch work, and it came in handy later when the real VLAN migration hit its first wall.
 
 The Pi-hole situation was a good reminder that "it runs in Docker everywhere else" isn't the same as "it will work in Docker here." A combination of environmental factors made the containerized path genuinely impractical for this specific setup, not just inconvenient.
 
----
-
 ## Where This Is Going
 
-The current setup is a flat `192.168.1.x` network with DNS filtering and two WiFi networks. The next step is a Cisco Catalyst WS-C2960C-12PC-L — a managed PoE switch that enables proper VLAN segmentation and port mirroring for traffic analysis.
+The current setup is a flat `192.168.1.x` network with DNS filtering and two WiFi networks. The next step is a Cisco Catalyst WS-C2960C-12PC-L, a managed PoE switch that enables proper VLAN segmentation and port mirroring for traffic analysis.
 
 The planned VLAN structure avoids VLAN 1 entirely. VLAN 1 is the default native VLAN on 802.1Q trunks, which makes it the outer tag in double-tagging attacks. Easier to just not use it.
 

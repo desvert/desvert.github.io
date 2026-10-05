@@ -14,7 +14,7 @@ excerpt: ""
 ---
 ## OverTheWire - narnia0
 
-The Narnia wargames at overthewire.org are designed to help learn basic exploitation techniques. Each level has a binary to exploit, and to make it a bit easier to figure out, the source code is also provided.
+The Narnia wargames at overthewire.org teach basic exploitation techniques. Each level has a binary to exploit, and the source code is provided to make it easier to figure out.
 
 ### Source for `narnia0.c` (comments added are mine):
 
@@ -126,12 +126,12 @@ Here is your chance: buf: BBBBBBBBBBBBBBBBBBBBﾭ�
 val: 0xdeadbeef
 ```
 
-That worked! So why didn’t my Python command?
+That worked! So why didn't my Python command?
 
-It boils down to string encoding differences:
+The difference is in how each language handles strings:
 
-- **Perl** treats `"\xef\xbe\xad\xde"` as raw bytes, sending them exactly as written.
-- **Python 3** treats strings as Unicode by default, so `print()` encodes non-ASCII characters in UTF-8, altering the byte sequence.
+- Perl treats `"\xef\xbe\xad\xde"` as raw bytes, sending them exactly as written.
+- Python 3 treats strings as Unicode by default, so `print()` encodes non-ASCII characters in UTF-8, altering the byte sequence.
 
 The fix was to use `sys.stdout.buffer.write()` to ensure raw bytes were written correctly:
 
@@ -144,7 +144,7 @@ val: 0xdeadbeef
 
 ### Getting the Shell:
 
-The "WAY OFF!!!!" message was gone, but I still didn’t see a shell prompt. It turns out `/bin/sh` needs interactive input to remain open. Running the exploit with `cat` kept it from immediately closing:
+The "WAY OFF!!!!" message was gone, but I still didn't see a shell prompt. It turns out `/bin/sh` needs interactive input to remain open. Running the exploit with `cat` kept it from immediately closing:
 
 ```
 narnia0@gibson:/narnia$ (python3 -c 'import sys; sys.stdout.buffer.write(b"B" * 20 + b"\xef\xbe\xad\xde")'; cat) | ./narnia0
