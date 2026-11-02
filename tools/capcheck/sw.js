@@ -1,4 +1,4 @@
-const CACHE_NAME = "capcheck-v2";
+const CACHE_NAME = "capcheck-v3";
 const APP_SHELL = ["./", "index.html", "manifest.json", "icon.svg"];
 
 self.addEventListener("install", (event) => {
